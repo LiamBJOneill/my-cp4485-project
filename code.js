@@ -1,8 +1,6 @@
-
 //import * as MyModual from "./TestModual";
 
 let toggle = true;
-
 
 // A Medium Maze
 let test_maze_tiles =  [[true,true,true,true,true,true,true,true,true,true,true,true,true],
@@ -76,7 +74,6 @@ class tile {
             }
         }
     }
-
 }
 
 class specialTile {
@@ -92,9 +89,9 @@ class map {
         this.size_x = size_x;
         this.size_y = size_y;
         this.tiles = tiles;
-        this.tileMap = tileMap;
+        //this.tileMap = tileMap;
+        this.tileMap = this.genFullMaze();
         this.specialTile = new specialTile("A_Point.png", 6, 5);
-        //console.log(this.specialTile);
         for (let i = 0; i<this.size_x; i++) {
             this.tiles[i] = [];
             for (let j = 0; j<this.size_y; j++) {
@@ -102,6 +99,95 @@ class map {
             }
         }
     }
+
+    boundCherker(x_pos, y_pos) {
+        if (x_pos) {
+            
+        }
+    }
+
+    genMaze(partialMaze, currentTile, perviousTile) {
+        /// 20th of Nov. Logical error in maze generation caused by walls and floors both being tiles and not correctly checking
+        /// neighbouring tiles to see if unintended paths are opened.
+        /// Honestly may leave generation here not quite the intent but nice.
+        /// very close to satifactory outcome.
+        /// walls will need to be updated later and A & B given random start postions
+        /// curently A & B can start in walls
+        let newTile;
+        //let direction;
+        let directionList = [0,1,2,3]
+        for (let i = directionList.length-1; i >= 0; i--) {
+            let rngIndex = Math.floor(Math.random()*directionList.length);
+            let temp = directionList[i];
+            directionList[i] = directionList[rngIndex];
+            directionList[rngIndex] = temp;
+        }
+        for (let i = 0; i < directionList.length; i++){
+            let direction = directionList[i];
+            switch(direction) {
+                case 0:
+                    // temp
+                    newTile = new tile(false,"Floor_Tile.png", currentTile.x_pos-1, currentTile.y_pos, 0);
+                    break;
+                case 1:
+                    //temp
+                    newTile = new tile(false,"Floor_Tile.png", currentTile.x_pos+1, currentTile.y_pos, 0);
+                    break;
+                case 2:
+                    //temp
+                    newTile = new tile(false,"Floor_Tile.png", currentTile.x_pos, currentTile.y_pos-1, 0);
+                    break;
+                case 3:
+                    //temp
+                    newTile = new tile(false,"Floor_Tile.png", currentTile.x_pos, currentTile.y_pos+1, 0);
+                    break;
+                default:
+                    //temp
+                    break;
+            }
+            //console.log(direction);
+            if (newTile.x_pos == perviousTile.x_pos && newTile.y_pos == perviousTile.y_pos) {
+                //console.log("I Broke at 1");
+                continue;
+            } else if (newTile.x_pos < 1 || newTile.x_pos > this.size_x-2) {
+                //console.log("I Broke at 2");
+                continue;
+            } else if (newTile.y_pos < 1 || newTile.y_pos > this.size_y-2) {
+                //console.log("I Broke at 3");
+                continue;
+            } else if (!partialMaze[newTile.x_pos][newTile.y_pos]) {
+                //console.log("I Broke at 4");
+                continue;
+            } else if (!(partialMaze[newTile.x_pos+1][newTile.y_pos]) && (currentTile.x_pos != newTile.x_pos+1 && currentTile.y_pos != newTile.y_pos)) {
+                continue;
+            } else if (!(partialMaze[newTile.x_pos-1][newTile.y_pos]) && (currentTile.x_pos != newTile.x_pos-1 && currentTile.y_pos != newTile.y_pos)) {
+                continue;
+            } else if (!(partialMaze[newTile.x_pos][newTile.y_pos+1]) && (currentTile.x_pos != newTile.x_pos && currentTile.y_pos != newTile.y_pos+1)) {
+                continue;
+            } else if (!(partialMaze[newTile.x_pos][newTile.y_pos-1]) && (currentTile.x_pos != newTile.x_pos || currentTile.y_pos != newTile.y_pos-1)) {
+                continue;
+            } else {
+                //console.log("I Broke worked actually");
+                partialMaze[newTile.x_pos][newTile.y_pos] = false;
+                this.genMaze(partialMaze, newTile, currentTile);
+            }
+        }
+        return (partialMaze);
+    }
+
+    genFullMaze() {
+        /// Not really generating the maze fully just a tile map
+        let tileMap = [];
+        for(let i = 0; i < this.size_x; i++) {
+            tileMap[i] = []
+            for(let j = 0; j < this.size_y; j++) {
+                tileMap[i][j] = true;
+            }
+        }
+        let startTile =  new tile(false, "Floor_Tile.png", 3, 3, 0);
+        return this.genMaze(tileMap, startTile, startTile);
+    }
+
     makeGrid() {
 
         /// Need to find put why this rotates the map 90 degrees clock-wise??
@@ -137,6 +223,7 @@ class map {
             //console.log("row " + i + " made");
         }
         document.querySelector("#c" + this.specialTile.x_pos + "-" + this.specialTile.y_pos).src = "A_Point.png";
+        document.querySelector("#c3-3").src = "B_Point.png";
         
     }
 
@@ -149,7 +236,6 @@ class map {
                 count += 1;
             }
         }
-        //console.log(count);
         switch (count) {
             case 0:
                 // all adjacent tiles are floor insert future island tile here
@@ -214,7 +300,6 @@ class map {
                 this.tiles[i][0].setImg("./Tiles/Wall_Deep_Tile.png");
             } else {
                 this.tiles[i][0].setImg("./Tiles/Wall_Single_Tile.png");
-                //this.tiles[i][0].rotation = "transform:rotate(270deg);";
             }
         }
         for (let i = 0; i < this.size_y; i++) {
@@ -227,20 +312,18 @@ class map {
         }
     }
 
-
     collisionCheck(new_x, new_y) {
         if (this.tiles[new_x, new_y].solid) {
             return true;
         }
         return false;
     }
-    move(e) {
-        //console.log(this.tiles[this.specialTile.x_pos][this.specialTile.y_pos].solid);
 
+    move(e) {
         switch (e.keyCode) {
             case 87:
+                // up
                 if(this.specialTile.y_pos > 0) {
-                    //console.log(this.specialTile.x_pos + "-" + this.specialTile.y_pos);
                     if (!this.tiles[this.specialTile.x_pos][this.specialTile.y_pos-1].solid)  {
                         document.querySelector("#c" + this.specialTile.x_pos + "-" + this.specialTile.y_pos).src = "Floor_Tile.png";
                         this.specialTile.y_pos -= 1;
@@ -281,7 +364,6 @@ class map {
             default:
                 // some emergency code;
         }
-        //console.log(this.specialTile.x_pos + "-" + this.specialTile.y_pos);
     }
 }
 
@@ -295,9 +377,6 @@ function rapperMove(e) {
 }
 
 function onBoot() {
-    //MyModual;
-    //testModual();
-    //console.log(test_map.tiles);//.wallImgSelector([true,true,true,false]));
     document.addEventListener("keydown", rapperMove);
     test_map.makeGrid();
 }
