@@ -4,11 +4,40 @@ html {
     font-size: 16px;
 }
 
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+}
+
+ul#instructions {
+    float: left;
+}
+
+ul#highScores {
+    float: right;
+    margin-right: 4rem;
+    list-style: none;
+}
+
+li.title {
+    list-style: none;
+    font-size: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+
 table#map {
     font-style: italic;
     border-collapse: collapse;
     padding: 0rem;
-    margin: 0rem;
+    margin: auto;
     font-size: 1em;
 }
 
@@ -18,7 +47,6 @@ table#map td {
 }
 
 img.tile{
-    /* width: 40%; */
     width: 2.5em;
 }
 
